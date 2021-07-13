@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Baloot-maryamMemarzadeh</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
+    <string name="msg_please_wait">msg_please_wait</string>
+    <string name="about">I am able to handle multiple tasks on a daily basis. I use creative approaches to solve problems. I am hardworking and responsible.</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title">title</string>
+    <string name="about_me">about me</string>
+</resources>
