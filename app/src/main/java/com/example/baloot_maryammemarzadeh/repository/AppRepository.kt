@@ -15,10 +15,10 @@ import okhttp3.ResponseBody
 
 class AppRepository(private var apiService: APIService, private var database: AppDatabase) {
 
-    fun insertData(context: Context?, id: String) {
+    fun insertData(context: Context?, title: String,author:String,year:String) {
         CoroutineScope(IO).launch {
-            val movieDetails = NewsTableModel(id,"","","","")
-            database.appDao().insertData(movieDetails)
+            val article = NewsTableModel(title,author,year)
+            database.appDao().insertData(article)
         }
     }
 //

@@ -17,8 +17,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baloot_maryammemarzadeh.R
@@ -33,7 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
     private lateinit var pageViewModel: PageViewModel
-    private var _binding: FragmentMainBinding? = null
+    private var binding: FragmentMainBinding? = null
     lateinit var adapter:RecyclerAdapter
     private lateinit var nav_controler:NavController
 
@@ -41,7 +39,6 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
     // This property is only valid between onCreateView and
     // onDestroyView.
-    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,13 +52,12 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentMainBinding.inflate(inflater, container, false)
-        val root = binding.root
+        binding = FragmentMainBinding.inflate(inflater, container, false)
         observe()
         pageViewModel.getNews()
         showLoading()
 
-        return root
+        return binding!!.root
     }
 
     companion object {
@@ -92,17 +88,18 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
         var visibleItemCount: Int
         var totalItemCount: Int
 
-        val mLayoutManager = LinearLayoutManager(activity)
-        binding.recycler.layoutManager = mLayoutManager
+        val mLayoutManager = LinearLayoutManager(context)
+        binding!!.recycler.layoutManager = mLayoutManager
 
-        nav_controler=Navigation.findNavController(binding.root)
+
+//        nav_controler=Navigation.findNavController(view)
 
 //        val navHostFragment = supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment) as NavHostFragment
 //        val navController = navHostFragment.navController
 
 
 
-        binding.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        binding!!.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0) { //check for scroll down
                     visibleItemCount = mLayoutManager.childCount
@@ -114,16 +111,13 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
                             Log.v("...", "Last Item Wow !")
                             // Do pagination.. i.e. fetch new data
                             pageViewModel.getNews()
+                            observe()
                             loading = true
                         }
                     }
                 }
             }
         })
-    }
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onItemClick(position: Int) {
@@ -137,13 +131,13 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
             hideLoading()
             if (it!=null){
                 articleList= it as ArrayList<Article>
-                binding.recycler.apply {
-                    layoutManager = LinearLayoutManager(context)
+                binding!!.recycler.apply {
+//                    layoutManager = LinearLayoutManager(context)
                     // set the custom adapter to the RecyclerView
                     adapter = RecyclerAdapter(it,this@PlaceholderFragment)
                 }
                 for (i in it)
-                    pageViewModel.storeInDb(context,i.title!!)
+                    pageViewModel.storeInDb(context,i.title!!,i.author!!,i.publishedAt!!)
             }
             else
                 Toast.makeText(activity,"error fetching data!", Toast.LENGTH_SHORT).show()
@@ -151,7 +145,6 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
     }
 
     private var progress: ProgressDialog? = null
-    var isConnect:Boolean=false
     /**
      * Show loading.
      */
@@ -186,6 +179,7 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
     override fun onResume() {
         super.onResume()
         isNetworkConnected()
+        observe()
     }
     fun isNetworkConnected():Boolean {
         val connectivityManager = requireActivity().getSystemService(AppCompatActivity.CONNECTIVITY_SERVICE) as ConnectivityManager

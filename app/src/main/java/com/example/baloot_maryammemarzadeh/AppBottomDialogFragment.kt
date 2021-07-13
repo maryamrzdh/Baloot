@@ -9,13 +9,13 @@ import com.example.baloot_maryammemarzadeh.databinding.FragmentSecondBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 
-class BottomDialogFragment constructor(var text:String) : BottomSheetDialogFragment() {
+class AppBottomDialogFragment constructor(var text:String) : BottomSheetDialogFragment() {
 
     companion object {
 
         const val TAG = "CustomBottomSheetDialogFragment"
         lateinit var binding: BottomSheetBinding
-
+        fun newInstance(text: String) = AppBottomDialogFragment(text)
     }
 
     override fun onCreateView(

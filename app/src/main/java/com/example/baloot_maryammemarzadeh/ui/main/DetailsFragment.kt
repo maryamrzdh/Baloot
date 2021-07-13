@@ -33,21 +33,22 @@ class DetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
       binding!!.article= article
+        var mImageView = binding!!.img
+        Picasso.get().load(article.urlToImage).into(mImageView)
 
 
-
-        @BindingAdapter("urlImage")
-        fun bindUrlImage(view: ImageView, imageUrl: String?) {
-            if (imageUrl != null) {
-                Picasso.get()
-                    .load(imageUrl)
-                    .fit()
-                    .centerCrop()
-                    .into(view)
-            } else {
-                view.setImageBitmap(null)
-            }
-        }
+//        @BindingAdapter("urlImage")
+//        fun bindUrlImage(view: ImageView, imageUrl: String?) {
+//            if (imageUrl != null) {
+//                Picasso.get()
+//                    .load(imageUrl)
+//                    .fit()
+//                    .centerCrop()
+//                    .into(view)
+//            } else {
+//                view.setImageBitmap(null)
+//            }
+//        }
 
 
     }

@@ -1,7 +1,6 @@
 package com.example.baloot_maryammemarzadeh.ui.second
 
 import androidx.lifecycle.ViewModel
-import com.example.baloot_maryammemarzadeh.BottomDialogFragment
 import com.example.baloot_maryammemarzadeh.repository.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

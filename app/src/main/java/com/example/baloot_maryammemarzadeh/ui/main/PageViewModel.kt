@@ -30,8 +30,8 @@ class PageViewModel @Inject constructor(private val repository: AppRepository) :
             )
     }
 
-    fun storeInDb(context: Context?,string: String){
-        repository.insertData(context,string)
+    fun storeInDb(context: Context?,string: String,author:String,year:String){
+        repository.insertData(context,string,author,year)
     }
 
     fun getResult(): MutableLiveData<List<Article>?> {

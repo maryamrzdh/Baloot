@@ -18,12 +18,6 @@ data class NewsTableModel (
     @ColumnInfo(name = "Year")
     var Year: String,
 
-    @ColumnInfo(name = "type")
-    var Type: String,
-
-    @ColumnInfo(name="poster")
-    var poster :String
-
 
 ) {
 
