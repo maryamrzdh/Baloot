@@ -2,7 +2,6 @@ package com.example.baloot_maryammemarzadeh.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.example.baloot_maryammemarzadeh.R
 import com.example.baloot_maryammemarzadeh.databinding.ActivityMainBinding
@@ -22,19 +21,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        viewModel= ViewModelProvider(this).get(PageViewModel::class.java)
+        binding= ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+//        binding = ActivityMainBinding.inflate(layoutInflater)
+        viewModel= ViewModelProvider(this).get(PageViewModel::class.java)
 
-        if (savedInstanceState == null) {
-            val fragment = PlaceholderFragment()
-            binding.fragmentContainer
-            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
-                .commit()
-        }
+//        if (savedInstanceState == null) {
+//            val fragment = PlaceholderFragment()
+//            binding.fragmentContainer
+//            supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
+//                .commit()
+//        }
     }
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { menuItem ->

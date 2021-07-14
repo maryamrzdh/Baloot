@@ -17,6 +17,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baloot_maryammemarzadeh.R
@@ -37,14 +38,10 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
     var articleList=ArrayList<Article>()
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        pageViewModel = ViewModelProvider(this).get(PageViewModel::class.java).apply {
-//            setIndex(arguments?.getInt(ARG_SECTION_NUMBER) ?: 1)
-        }
+        pageViewModel = ViewModelProvider(requireActivity()).get(PageViewModel::class.java)
+
     }
 
     override fun onCreateView(
@@ -53,32 +50,15 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
     ): View {
 
         binding = FragmentMainBinding.inflate(inflater, container, false)
-        observe()
-        pageViewModel.getNews()
         showLoading()
+        pageViewModel.getNews()
+        observe()
 
         return binding!!.root
     }
 
     companion object {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private const val ARG_SECTION_NUMBER = "section_number"
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        @JvmStatic
-        fun newInstance(list: ArrayList<Article>): PlaceholderFragment {
-            return PlaceholderFragment().apply {
-                arguments = Bundle().apply {
-//                    putInt(ARG_SECTION_NUMBER, sectionNumber)
-                }
-            }
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,15 +69,12 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
         var totalItemCount: Int
 
         val mLayoutManager = LinearLayoutManager(context)
-        binding!!.recycler.layoutManager = mLayoutManager
 
+        binding!!.recycler.apply {
+            layoutManager = mLayoutManager
+            adapter = RecyclerAdapter(articleList,this@PlaceholderFragment)
 
-//        nav_controler=Navigation.findNavController(view)
-
-//        val navHostFragment = supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment) as NavHostFragment
-//        val navController = navHostFragment.navController
-
-
+        }
 
         binding!!.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -111,7 +88,7 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
                             Log.v("...", "Last Item Wow !")
                             // Do pagination.. i.e. fetch new data
                             pageViewModel.getNews()
-                            observe()
+//                            observe()
                             loading = true
                         }
                     }
@@ -123,32 +100,36 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
     override fun onItemClick(position: Int) {
         val article=articleList[position]
         val bundle= bundleOf("art" to article)
-        nav_controler.navigate(R.id.action_placeholderFragment_to_detailsFragment2,bundle)
+        val action = PlaceholderFragmentDirections.actionPlaceholderFragmentToDetailsFragment2(article)
+        findNavController().navigate(action)
     }
 
-    fun observe(){
-        pageViewModel.getResult().observe(viewLifecycleOwner,{it->
-            hideLoading()
-            if (it!=null){
-                articleList= it as ArrayList<Article>
-                binding!!.recycler.apply {
-//                    layoutManager = LinearLayoutManager(context)
-                    // set the custom adapter to the RecyclerView
-                    adapter = RecyclerAdapter(it,this@PlaceholderFragment)
-                }
+    private fun observe(){
+
+        pageViewModel.getResult().observe(requireActivity(),
+            {
+                hideLoading()
+
+                if (it!=null){
+                articleList.addAll(it)
+                binding!!.recycler.adapter!!.notifyDataSetChanged()
+
                 for (i in it)
                     pageViewModel.storeInDb(context,i.title!!,i.author!!,i.publishedAt!!)
-            }
-            else
+            } else
                 Toast.makeText(activity,"error fetching data!", Toast.LENGTH_SHORT).show()
+
+
+                pageViewModel.reset()
         })
+
     }
 
     private var progress: ProgressDialog? = null
     /**
      * Show loading.
      */
-    open fun showLoading() {
+    private fun showLoading() {
         hideLoading()
         progress = showLoadingDialog(activity)
     }
@@ -156,7 +137,7 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
     /**
      * Hide loading.
      */
-    open fun hideLoading() {
+    private fun hideLoading() {
         if (progress != null && progress!!.isShowing()) {
             progress!!.cancel()
         }
@@ -179,7 +160,6 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
     override fun onResume() {
         super.onResume()
         isNetworkConnected()
-        observe()
     }
     fun isNetworkConnected():Boolean {
         val connectivityManager = requireActivity().getSystemService(AppCompatActivity.CONNECTIVITY_SERVICE) as ConnectivityManager

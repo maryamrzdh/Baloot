@@ -25,7 +25,8 @@ class PageViewModel @Inject constructor(private val repository: AppRepository) :
                     return@map null
             }
             .subscribe(
-                {it->result.value=it},
+                {it-> result.value=it
+                },
                 { result.value=null }
             )
     }
@@ -36,5 +37,14 @@ class PageViewModel @Inject constructor(private val repository: AppRepository) :
 
     fun getResult(): MutableLiveData<List<Article>?> {
         return result
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        result.value=null
+    }
+
+    fun reset() {
+        result.value = null
     }
 }
