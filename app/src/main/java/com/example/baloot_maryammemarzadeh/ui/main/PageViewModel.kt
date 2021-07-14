@@ -16,8 +16,8 @@ class PageViewModel @Inject constructor(private val repository: AppRepository) :
 
     private var result=MutableLiveData<List<Article>?>()
 
-    fun getNews() {
-        repository.getNews().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+    fun getNews(int: Int) {
+        repository.getNews(int).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
             .map {input->
                 if (input.status.equals("ok"))
                     return@map input.articles

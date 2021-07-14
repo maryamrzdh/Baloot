@@ -27,9 +27,9 @@ class AppRepository(private var apiService: APIService, private var database: Ap
 //    }
 
 
-    //server
-    fun getNews(): Observable<ApiResponse> {
-        return apiService.getNews()
+    fun getNews(page :Int): Observable<ApiResponse> {
+        val url = "v2/everything?q=tesla&from=2021-06-13&pageSize=20&page=$page&sortBy=publishedAt&apiKey=b59977a0398b41af9b69d1de701a5f20"
+        return apiService.getNews(url)
     }
 
 }

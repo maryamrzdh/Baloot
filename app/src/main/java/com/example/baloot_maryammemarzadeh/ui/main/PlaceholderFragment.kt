@@ -15,8 +15,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,8 +33,9 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
     private lateinit var pageViewModel: PageViewModel
     private var binding: FragmentMainBinding? = null
-    lateinit var adapter:RecyclerAdapter
-    private lateinit var nav_controler:NavController
+    lateinit var adapterAdapter:RecyclerAdapter
+    lateinit var observer:Observer<List<Article>?>
+    var page=1
 
     var articleList=ArrayList<Article>()
 
@@ -51,7 +52,7 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
         binding = FragmentMainBinding.inflate(inflater, container, false)
         showLoading()
-        pageViewModel.getNews()
+        pageViewModel.getNews(page)
         observe()
 
         return binding!!.root
@@ -72,7 +73,7 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
         binding!!.recycler.apply {
             layoutManager = mLayoutManager
-            adapter = RecyclerAdapter(articleList,this@PlaceholderFragment)
+            adapterAdapter = RecyclerAdapter(articleList,this@PlaceholderFragment)
 
         }
 
@@ -87,8 +88,11 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
                             loading = false
                             Log.v("...", "Last Item Wow !")
                             // Do pagination.. i.e. fetch new data
-                            pageViewModel.getNews()
-//                            observe()
+                            pageViewModel.getResult().removeObserver(observer)
+
+                            page++
+                            pageViewModel.getNews(page)
+                            observe()
                             loading = true
                         }
                     }
@@ -106,22 +110,25 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
     private fun observe(){
 
-        pageViewModel.getResult().observe(requireActivity(),
-            {
-                hideLoading()
+         observer = Observer<List<Article>?> {
+            hideLoading()
 
-                if (it!=null){
+            if (it != null) {
                 articleList.addAll(it)
-                binding!!.recycler.adapter!!.notifyDataSetChanged()
+                adapterAdapter.notifyDataSetChanged()
 
                 for (i in it)
-                    pageViewModel.storeInDb(context,i.title!!,i.author!!,i.publishedAt!!)
+                    pageViewModel.storeInDb(context, i.title!!, i.author!!, i.publishedAt!!)
             } else
-                Toast.makeText(activity,"error fetching data!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity, "error fetching data!", Toast.LENGTH_SHORT).show()
+
+            pageViewModel.reset()
 
 
-                pageViewModel.reset()
-        })
+        }
+        pageViewModel.getResult().observe(requireActivity(),observer)
+
+
 
     }
 

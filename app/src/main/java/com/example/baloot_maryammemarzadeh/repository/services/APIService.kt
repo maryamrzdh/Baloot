@@ -7,10 +7,6 @@ import retrofit2.http.*
 
 interface APIService {
 
-    /**
-     *
-     */
-
-    @GET("v2/everything?q=tesla&from=2021-06-13&sortBy=publishedAt&apiKey=b59977a0398b41af9b69d1de701a5f20")
-    fun getNews(): Observable<ApiResponse>
+    @GET
+    fun getNews( @Url url: String): Observable<ApiResponse>
 }
