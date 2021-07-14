@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.baloot_maryammemarzadeh.PaginationScrollListener
 import com.example.baloot_maryammemarzadeh.R
 import com.example.baloot_maryammemarzadeh.databinding.FragmentMainBinding
 import com.example.baloot_maryammemarzadeh.model.Article
@@ -33,9 +34,12 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
     private lateinit var pageViewModel: PageViewModel
     private var binding: FragmentMainBinding? = null
-    lateinit var adapterAdapter:RecyclerAdapter
+//    lateinit var adapterAdapter:RecyclerAdapter
     lateinit var observer:Observer<List<Article>?>
     var page=1
+
+    var isLastPage: Boolean = false
+    var loading: Boolean = false
 
     var articleList=ArrayList<Article>()
 
@@ -64,7 +68,7 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var loading = true
+//        var loading = true
         var pastVisibleItems: Int
         var visibleItemCount: Int
         var totalItemCount: Int
@@ -73,32 +77,45 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
         binding!!.recycler.apply {
             layoutManager = mLayoutManager
-            adapterAdapter = RecyclerAdapter(articleList,this@PlaceholderFragment)
+            adapter = RecyclerAdapter(articleList,this@PlaceholderFragment)
 
         }
 
-        binding!!.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0) { //check for scroll down
-                    visibleItemCount = mLayoutManager.childCount
-                    totalItemCount = mLayoutManager.itemCount
-                    pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition()
-                    if (loading) {
-                        if (visibleItemCount + pastVisibleItems >= totalItemCount) {
-                            loading = false
-                            Log.v("...", "Last Item Wow !")
-                            // Do pagination.. i.e. fetch new data
-                            pageViewModel.getResult().removeObserver(observer)
+        binding!!.recycler.addOnScrollListener(object : PaginationScrollListener(mLayoutManager) {
+            override fun isLastPage(): Boolean {
+                return isLastPage
+            }
 
-                            page++
-                            pageViewModel.getNews(page)
-                            observe()
-                            loading = true
-                        }
-                    }
-                }
+            override fun isLoading(): Boolean {
+                return loading
+            }
+
+            override fun loadMoreItems() {
+                loading = true
+                //you have to call loadmore items to get more data
+                page++
+                pageViewModel.getNews(page)
             }
         })
+//        binding!!.recycler.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+//            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+//                if (dy > 0) { //check for scroll down
+//                    visibleItemCount = mLayoutManager.childCount
+//                    totalItemCount = mLayoutManager.itemCount
+//                    pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition()
+//                    if (loading) {
+//                        if (visibleItemCount + pastVisibleItems >= totalItemCount) {
+//                            loading = false
+//                            Log.v("...", "Last Item Wow !")
+//                            // Do pagination.. i.e. fetch new data
+//                            page++
+//                            pageViewModel.getNews(page)
+//                            loading = true
+//                        }
+//                    }
+//                }
+//            }
+//        })
     }
 
     override fun onItemClick(position: Int) {
@@ -112,24 +129,24 @@ class PlaceholderFragment : Fragment(),RecyclerAdapter.ClickListener {
 
          observer = Observer<List<Article>?> {
             hideLoading()
-
             if (it != null) {
                 articleList.addAll(it)
-                adapterAdapter.notifyDataSetChanged()
+
+//                if(articleList.isEmpty())
+//                    articleList= it as ArrayList<Article>
+//                else
+//                    articleList.addAll(it)
+//                adapterAdapter = RecyclerAdapter(articleList,this@PlaceholderFragment)
+
+                binding!!.recycler.adapter!!.notifyDataSetChanged()
 
                 for (i in it)
                     pageViewModel.storeInDb(context, i.title!!, i.author!!, i.publishedAt!!)
             } else
                 Toast.makeText(activity, "error fetching data!", Toast.LENGTH_SHORT).show()
-
             pageViewModel.reset()
-
-
         }
         pageViewModel.getResult().observe(requireActivity(),observer)
-
-
-
     }
 
     private var progress: ProgressDialog? = null

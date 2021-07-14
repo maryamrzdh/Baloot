@@ -8,7 +8,7 @@ import com.example.baloot_maryammemarzadeh.R
 import com.example.baloot_maryammemarzadeh.model.Article
 
 
-class RecyclerAdapter(private val itemsList: ArrayList<Article>, private val cellClickListener: ClickListener) : RecyclerView.Adapter<RecyclerAdapter.MovieViewHolder>()  {
+class RecyclerAdapter(private var itemsList: ArrayList<Article>, private val cellClickListener: ClickListener) : RecyclerView.Adapter<RecyclerAdapter.MovieViewHolder>()  {
 
     class MovieViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
         RecyclerView.ViewHolder(inflater.inflate(R.layout.list_items, parent, false)){

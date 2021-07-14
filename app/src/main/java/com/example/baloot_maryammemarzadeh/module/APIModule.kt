@@ -64,5 +64,6 @@ class APIModule {
 
     companion object {
         private const val BASE_URL = "https://newsapi.org/"
+
     }
 }

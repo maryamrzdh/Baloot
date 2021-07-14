@@ -25,9 +25,8 @@ class PageViewModel @Inject constructor(private val repository: AppRepository) :
                     return@map null
             }
             .subscribe(
-                {it-> result.value=it
-                },
-                { result.value=null }
+                {it-> result.value=it as ArrayList },
+                { _->result.value=null }
             )
     }
 

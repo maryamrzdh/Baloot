@@ -28,7 +28,8 @@ class AppRepository(private var apiService: APIService, private var database: Ap
 
 
     fun getNews(page :Int): Observable<ApiResponse> {
-        val url = "v2/everything?q=tesla&from=2021-06-13&pageSize=20&page=$page&sortBy=publishedAt&apiKey=b59977a0398b41af9b69d1de701a5f20"
+        val url = "v2/everything?q=tesla&from=2021-06-13&pageSize=20&page=$page&sortBy=publishedAt&apiKey=10ea5b0d346a426283f5191f9cad3142"
+//        val url = "v2/top-headlines?sources=techcrunch&apiKey=b59977a0398b41af9b69d1de701a5f20"
         return apiService.getNews(url)
     }
 
